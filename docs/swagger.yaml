@@ -1,0 +1,47 @@
+definitions:
+  app.Response:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  app.User:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  app.UserResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+      user:
+        $ref: '#/definitions/app.User'
+    type: object
+info:
+  contact: {}
+paths:
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Tells if the chi-swagger APIs are working or not.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful Response
+          schema:
+            $ref: '#/definitions/app.UserResponse'
+        "404":
+          description: Failure Response
+          schema:
+            $ref: '#/definitions/app.Response'
+      summary: This API can be used for User stuff.
+      tags:
+      - User Info
+swagger: "2.0"

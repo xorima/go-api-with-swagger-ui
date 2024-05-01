@@ -31,4 +31,7 @@ Handled via slog library.
 
 Database: 
 Postgres for the database.
-# go-api-with-swagger-ui
+
+## Updating swagger
+
+Remember to run swag init each time. Later put this into the precommit hooks
