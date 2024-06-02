@@ -109,9 +109,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "dice_rolls_total",
+          "expr": "rate(dice_rolls_total[$__rate_interval])",
           "fullMetaSearch": false,
-          "includeNullMetadata": true,
+          "includeNullMetadata": false,
           "instant": false,
           "legendFormat": "{{job}}-roll-{{roll_value}}",
           "range": true,
@@ -137,6 +137,6 @@
   "timezone": "browser",
   "title": "Demo Api",
   "uid": "cdnk62di1wlxce",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }

@@ -12,13 +12,23 @@ processors:
 exporters:
   prometheusremotewrite: # the PRW exporter, to ingest metrics to backend
     endpoint: http://mimir:9009/api/v1/push
+  otlp/grafana:
+    # Send to the locally running Tempo service.
+    endpoint: tempo:4317 #grpc
+    # TLS is not enabled for the instance.
+    tls:
+      insecure: true
 
 service:
   pipelines:
-    metrics/prod:
+    metrics:
       receivers: [otlp]
       processors: [batch]
       exporters: [prometheusremotewrite]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/grafana]
 
 extensions:
  health_check:
