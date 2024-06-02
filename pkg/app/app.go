@@ -17,6 +17,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -157,9 +158,18 @@ func (uh *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 	span.AddEvent("User created", trace.WithAttributes(attribute.String("user", "test")))
 	span.SetStatus(codes.Ok, "User created")
 	// new span
+	_, spaner := tracer.Start(ctx, "dns update")
+	time.Sleep(time.Duration(rand.Int()) * time.Millisecond)
+	spaner.End()
 	_, span2 := tracer.Start(ctx, "db insert")
-	time.Sleep(1 * time.Second)
+	time.Sleep(time.Duration(rand.Int()) * time.Second)
 	span2.End()
+	_, span2 = tracer.Start(ctx, "cache update")
+	time.Sleep(time.Duration(rand.Int()) * time.Millisecond)
+	span2.End()
+
+	time.Sleep(100 * time.Millisecond)
+
 	w.Write([]byte("user get"))
 
 }

@@ -4,14 +4,12 @@ import (
 	"context"
 	"errors"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	"go.opentelemetry.io/otel/exporters/stdout/stdoutlog"
 	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/metric"
-	"go.opentelemetry.io/otel/sdk/trace"
 	"time"
 )
 
@@ -40,16 +38,16 @@ func SetupOTelSDK(ctx context.Context) (shutdown func(context.Context) error, er
 	otel.SetTextMapPropagator(prop)
 
 	// Set up trace provider.
-	tracerProvider, err := newTraceProvider(ctx)
-	if err != nil {
-		handleErr(err)
-		return
-	}
-	shutdownFuncs = append(shutdownFuncs, tracerProvider.Shutdown)
-	otel.SetTracerProvider(tracerProvider)
+	//tracerProvider, err := newTraceProvider(ctx)
+	//if err != nil {
+	//	handleErr(err)
+	//	return
+	//}
+	//shutdownFuncs = append(shutdownFuncs, tracerProvider.Shutdown)
+	//otel.SetTracerProvider(tracerProvider)
 
 	// Set up meter provider.
-	meterProvider, err := newMeterProvider(ctx)
+	meterProvider, err := newMetricProvider(ctx)
 	if err != nil {
 		handleErr(err)
 		return
@@ -76,24 +74,25 @@ func newPropagator() propagation.TextMapPropagator {
 	)
 }
 
-func newTraceProvider(ctx context.Context) (*trace.TracerProvider, error) {
-	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure())
-	//traceExporter, err := stdouttrace.New(
-	//	stdouttrace.WithPrettyPrint())
-	if err != nil {
-		return nil, err
-	}
+//func newTraceProvider(ctx context.Context) (*trace.TracerProvider, error) {
+//	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithInsecure())
+//	//traceExporter, err := stdouttrace.New(
+//	//	stdouttrace.WithPrettyPrint())
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	traceProvider := trace.NewTracerProvider(
+//		trace.WithBatcher(traceExporter,
+//			// Default is 5s. Set to 1s for demonstrative purposes.
+//			trace.WithBatchTimeout(time.Second*1)),
+//	)
+//	return traceProvider, nil
+//}
 
-	traceProvider := trace.NewTracerProvider(
-		trace.WithBatcher(traceExporter,
-			// Default is 5s. Set to 1s for demonstrative purposes.
-			trace.WithBatchTimeout(time.Second*1)),
-	)
-	return traceProvider, nil
-}
-
-func newMeterProvider(ctx context.Context) (*metric.MeterProvider, error) {
-	metricExporter, err := otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithInsecure())
+func newMetricProvider(ctx context.Context) (*metric.MeterProvider, error) {
+	metricExporter, err := otlpmetrichttp.New(ctx,
+		otlpmetrichttp.WithInsecure())
 	//metricExporter, err := stdoutmetric.New(stdoutmetric.WithPrettyPrint())
 	if err != nil {
 		return nil, err
@@ -102,7 +101,7 @@ func newMeterProvider(ctx context.Context) (*metric.MeterProvider, error) {
 	meterProvider := metric.NewMeterProvider(
 		metric.WithReader(metric.NewPeriodicReader(metricExporter,
 			// Default is 1m. Set to 3s for demonstrative purposes.
-			metric.WithInterval(30*time.Second))),
+			metric.WithInterval(1*time.Second))),
 	)
 	return meterProvider, nil
 }

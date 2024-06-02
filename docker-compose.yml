@@ -1,0 +1,57 @@
+version: "2.1"
+volumes:
+  grafana:
+services:
+  demo-api:
+    container_name: demo-api
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - OTEL_SERVICE_NAME=demo-api
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+    depends_on:
+      - otel-collector
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:11.0.0
+    volumes:
+      - "./infra/grafana/definitions:/var/lib/grafana/dashboards"
+      - "./infra/grafana/provisioning:/etc/grafana/provisioning"
+    ports:
+      - "3000:3000"
+    environment:
+#      - GF_FEATURE_TOGGLES_ENABLE=flameGraph traceqlSearch correlations traceQLStreaming metricsSummary traceqlEditor traceToMetrics traceToProfiles datatrails
+#      - GF_INSTALL_PLUGINS=https://storage.googleapis.com/integration-artifacts/grafana-lokiexplore-app/grafana-lokiexplore-app-latest.zip;grafana-lokiexplore-app
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+  otel-collector:
+    container_name: otel-collector
+    image: otel/opentelemetry-collector:0.101.0
+    volumes:
+      - ./infra/otel-collector/cfg/otel.yml:/etc/otel-collector-config.yml
+    command: ["--config=/etc/otel-collector-config.yml"]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "55679:55679"
+      - "1777:1777"
+  mimir:
+    image: grafana/mimir:2.12.0
+    command: ["-ingester.native-histograms-ingestion-enabled=true", "-config.file=/etc/mimir.yaml"]
+    ports:
+      - "9009:9009"
+    volumes:
+      - "./infra/mimir/mimir.yaml:/etc/mimir.yaml"
+  k6:
+    image: grafana/k6
+    volumes:
+      - "./infra/k6:/scripts"
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://mimir:9009/api/v1/push
+      - K6_DURATION=3600s
+      - K6_VUS=4
+      - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=true
+    restart: always
+    command: ["run", "-o", "experimental-prometheus-rw", "/scripts/demo-api-load-test.js"]
