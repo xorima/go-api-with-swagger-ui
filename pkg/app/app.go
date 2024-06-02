@@ -13,7 +13,10 @@ import (
 	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/trace"
 	"net"
 	"net/http"
 	"os"
@@ -62,6 +65,7 @@ func (a *App) Run() (err error) {
 	// Set up OpenTelemetry.
 	otelShutdown, err := obervability.SetupOTelSDK(ctx)
 	if err != nil {
+		fmt.Println("error during setup...")
 		return
 	}
 	// Handle shutdown properly so nothing leaks.
@@ -150,6 +154,12 @@ func (uh *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 	defer span.End()
 	logger.InfoContext(ctx, "getting user")
 
+	span.AddEvent("User created", trace.WithAttributes(attribute.String("user", "test")))
+	span.SetStatus(codes.Ok, "User created")
+	// new span
+	_, span2 := tracer.Start(ctx, "db insert")
+	time.Sleep(1 * time.Second)
+	span2.End()
 	w.Write([]byte("user get"))
 
 }
