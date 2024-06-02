@@ -5,6 +5,36 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+  prometheus:
+    # Define a set of configurations for scraping by the OpenTelemetry Collector.
+    config:
+      # The `scrape_configs` section pertains to the Prometheus `scrape_configs`
+      # configuration block.
+      # See https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
+      scrape_configs:
+        # Scrape Mimir metrics.
+        - job_name: 'mimir'
+          static_configs:
+            - targets: ['mimir:9009']
+              labels:
+                service: 'mimir'
+                group: 'infrastructure'
+
+        # Scrape Tempo metrics.
+        - job_name: 'tempo'
+          static_configs:
+            - targets: ['tempo:3200']
+              labels:
+                service: 'tempo'
+                group: 'infrastructure'
+
+        # Scrape Grafana metrics.
+        - job_name: 'grafana'
+          static_configs:
+            - targets: ['grafana:3000']
+              labels:
+                service: 'grafana'
+                group: 'infrastructure'
 
 processors:
   batch:
@@ -12,6 +42,8 @@ processors:
 exporters:
   prometheusremotewrite: # the PRW exporter, to ingest metrics to backend
     endpoint: http://mimir:9009/api/v1/push
+    tls:
+      insecure: true
   otlp/grafana:
     # Send to the locally running Tempo service.
     endpoint: tempo:4317 #grpc
@@ -29,10 +61,3 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp/grafana]
-
-extensions:
- health_check:
- pprof:
-   endpoint: 0.0.0.0:1777
- zpages:
-   endpoint: 0.0.0.0:55679
