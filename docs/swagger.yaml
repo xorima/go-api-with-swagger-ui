@@ -25,7 +25,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /user:
+  /users:
     get:
       consumes:
       - application/json

@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/user": {
+        "/users": {
             "get": {
                 "description": "Tells if the chi-swagger APIs are working or not.",
                 "consumes": [
