@@ -10,12 +10,24 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
+	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/metric"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+)
+
+const name = "user"
+
+var (
+	tracer  = otel.Tracer(name)
+	meter   = otel.Meter(name)
+	logger  = otelslog.NewLogger(name)
+	rollCnt metric.Int64Counter
 )
 
 type Router interface {
@@ -134,16 +146,30 @@ type UserHandler struct {
 //	@Failure		404	{object}	app.Response		"Failure Response"
 //	@Router			/users [get]
 func (uh *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "user get")
+	defer span.End()
+	logger.InfoContext(ctx, "getting user")
+
 	w.Write([]byte("user get"))
 
 }
 func (uh *UserHandler) Post(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "user create")
+	defer span.End()
+	logger.InfoContext(ctx, "creating user")
+
 	w.Write([]byte("user post"))
 }
 func (uh *UserHandler) Put(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "user update")
+	defer span.End()
+	logger.InfoContext(ctx, "updating user")
 	w.Write([]byte("user put"))
 }
 func (uh *UserHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	ctx, span := tracer.Start(r.Context(), "user delete")
+	defer span.End()
+	logger.InfoContext(ctx, "deleting user")
 	w.Write([]byte("user delete"))
 }
 
@@ -174,7 +200,7 @@ func (uh *UserHandler) RegisterRoutes(r Router) {
 	handleFunc("POST", "/users", uh.Post)
 	handleFunc("DELETE", "/users", uh.Delete)
 
-	swagHandler := otelhttp.WithRouteTag("/swagger", http.HandlerFunc(httpSwagger.WrapHandler))
+	swagHandler := otelhttp.WithRouteTag("/swagger", httpSwagger.WrapHandler)
 	r.Mount("/swagger", swagHandler)
 
 }

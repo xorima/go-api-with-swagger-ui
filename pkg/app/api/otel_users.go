@@ -37,6 +37,7 @@ func RollDice(w http.ResponseWriter, r *http.Request) {
 	ctx, span := tracer.Start(r.Context(), "roll")
 	defer span.End()
 
+	logger.InfoContext(r.Context(), "Rolling the dice")
 	roll := 1 + rand.Intn(6)
 
 	var msg string
