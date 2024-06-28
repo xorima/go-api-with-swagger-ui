@@ -3,7 +3,7 @@ module demo-api
 go 1.22
 
 require (
-	github.com/go-chi/chi/v5 v5.0.14
+	github.com/go-chi/chi/v5 v5.1.0
 	github.com/prometheus/client_golang v1.19.1
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.3
