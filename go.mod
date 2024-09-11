@@ -8,17 +8,17 @@ require (
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.3
 	go.opentelemetry.io/contrib/bridges/otelslog v0.2.0
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0
-	go.opentelemetry.io/otel v1.28.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.55.0
+	go.opentelemetry.io/otel v1.30.0
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.28.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.28.0
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.4.0
 	go.opentelemetry.io/otel/log v0.4.0
-	go.opentelemetry.io/otel/metric v1.28.0
+	go.opentelemetry.io/otel/metric v1.30.0
 	go.opentelemetry.io/otel/sdk v1.28.0
 	go.opentelemetry.io/otel/sdk/log v0.4.0
 	go.opentelemetry.io/otel/sdk/metric v1.28.0
-	go.opentelemetry.io/otel/trace v1.28.0
+	go.opentelemetry.io/otel/trace v1.30.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11
 )
