@@ -14,7 +14,7 @@ services:
       - otel-collector
   grafana:
     container_name: grafana
-    image: grafana/grafana:11.1.0
+    image: grafana/grafana:11.2.2
     volumes:
       - "./infra/grafana/definitions:/var/lib/grafana/dashboards"
       - "./infra/grafana/provisioning:/etc/grafana/provisioning"
