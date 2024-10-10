@@ -38,7 +38,7 @@ services:
       - "55679:55679"
       - "1777:1777"
   mimir:
-    image: grafana/mimir:2.13.0
+    image: grafana/mimir:2.14.0
     command: ["-ingester.native-histograms-ingestion-enabled=true", "-config.file=/etc/mimir.yaml"]
     ports:
       - "9009:9009"
