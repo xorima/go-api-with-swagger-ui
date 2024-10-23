@@ -28,7 +28,7 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
   otel-collector:
     container_name: otel-collector
-    image: otel/opentelemetry-collector:0.104.0
+    image: otel/opentelemetry-collector:0.112.0
     volumes:
       - ./infra/otel-collector/cfg/otel.yml:/etc/otel-collector-config.yml
     command: ["--config=/etc/otel-collector-config.yml"]
